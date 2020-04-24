@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>照片信息获取</title>
+</head>
+<body>
+    请选择要获取照片信息的文件.
+    <input id="file-input" type="file" />
+    <br/>
+    <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+    <!--<script type="text/javascript" src="exif.js"></script>-->
+    <script>
+        document.getElementById("file-input").onchange = function(e) {
+            var file = e.target.files[0]
+            if (file && file.name) {
+                EXIF.getData(file, function() {
+                    var exifData = EXIF.pretty(this);
+                    if (exifData) {
+                        //alert(exifData);
+                        var date = EXIF.getTag(this, 'DateTime');
+                        var lat = EXIF.getTag(this, 'GPSLatitude');
+                        var latxs = lat[0]+(lat[1]+lat[2]/60)/60 ;
+                        var lon = EXIF.getTag(this, 'GPSLongitude');
+                        var lonxs = lon[0]+(lon[1]+lon[2]/60)/60 ;
+                        var gpsurl = "http://api.map.baidu.com/reverse_geocoding/v3/?ak=nYPs4LQ9a4VhVxj55AD69K6zgsRy9o4z&output=json&coordtype=wgs84ll&location=";
+                        prompt("经纬度:",gpsurl+latxs+","+lonxs);
+                        document.getElementById("demo-val").innerHTML = exifData;
+                        
+                    } else {
+                        alert("在图像中找不到EXIF数据'" + file.name + "'.");
+                    }
+                });
+            }
+        }
+    </script>
+    <textarea id="demo-val" cols="40" rows="40" readonly></textarea><div></div>
+</body>
+</html>
